@@ -1,28 +1,47 @@
 import pandas as pd
 import numpy as np
-from matplotlib import pyplot as plt
 import torch
 import torch.nn as nn
 import torch.utils.data
 import torch.nn.functional as F
 import torch.optim as optim
+
+from torch.utils.data import Dataset, DataLoader
 from sklearn.preprocessing import StandardScaler
+from torch.autograd import Variable
 
 from discriminator import Discriminator
 from generator import Generator
 
 print("Loading data...")
 
-data3 = pd.read_csv("creditcard.csv")
-data3['normAmount'] = StandardScaler().fit_transform(data3['Amount'].values.reshape(-1, 1))
-data3 = data3.drop(['Time','Amount'],axis=1)
+# Custom DataLoader
+class FraudDataset(Dataset):
 
-X = np.array(data3.ix[:, data3.columns != 'Class'])
-y = np.array(data3.ix[:, data3.columns == 'Class'])
+    # Initialize the data
+    def __init__(self):
+        data = pd.read_csv("creditcard.csv")
+        data['normAmount'] = StandardScaler().fit_transform(data['Amount'].values.reshape(-1, 1))
+        data = data.drop(['Time','Amount'],axis=1)
 
-from torch.autograd import Variable
-X = Variable(torch.FloatTensor(X))
-y = Variable(torch.FloatTensor(y))
+        self.len = data.shape[0]
+        self.X = np.array(data.loc[:, data.columns != 'Class'])
+        self.y = np.array(data.loc[:, data.columns == 'Class'])
+
+        self.X = Variable(torch.FloatTensor(self.X))
+        self.y = Variable(torch.FloatTensor(self.y))
+
+    def __getitem__(self, index):
+        return self.X[index], self.y[index]
+
+    def __len__(self):
+        return self.len
+
+dataset = FraudDataset()
+train_loader = DataLoader(dataset=dataset,
+                          batch_size=30,
+                          shuffle=True,
+                          num_workers=2)
 
 print("Starting generator and discriminator...")
 
