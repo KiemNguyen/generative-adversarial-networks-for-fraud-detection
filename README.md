@@ -1,5 +1,5 @@
-# generative-adversarial-networks-for-fraud-detection
-Generative Adversarial Networks for Fraud Detection
+# Generative Adversarial Networks for Fraud Detection
+![Preview](https://github.com/KiemNguyen/generative-adversarial-networks-for-fraud-detection/blob/master/assets/gans.png)
 
 Losses due to fraud are routinely estimated to be in the billions of dollars annually. This project attempts to solve class imbalance problem to build a better fraud detection model.
 
@@ -32,7 +32,7 @@ kg download -u <username> -p <password> -c creditcardfraud -f creditcard.csv
 ## Start
 
 ```bash
-python gans.py
+python training.py
 ```
 
 You will train two networks to battle together. Eventually, the 'fake' dataset will look very similar to the 'real' dataset.
